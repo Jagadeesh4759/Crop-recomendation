@@ -70,20 +70,31 @@ st.markdown(
     """
     <style>
     .main-container {
-        background-color: rgba(0, 128, 0, 0.7);  /* green with transparency */
+        background-color: rgba(0, 128, 0, 0.75);  /* green with transparency */
         padding: 30px;
         border-radius: 20px;
-        box-shadow: 0px 4px 10px rgba(0,0,0,0.4);
+        box-shadow: 0px 4px 12px rgba(0,0,0,0.4);
         color: black;
-        max-width: 450px;
-        margin-left: auto;
-        margin-right: 30px;
+        max-width: 500px;
+        margin: auto;   /* center the card */
     }
     .title {
-        color: red;
+        color: white;
         text-align: center;
         font-size: 28px;
         font-weight: bold;
+        margin-bottom: 20px;
+    }
+    .result-box {
+        background-color: white;
+        color: black;
+        padding: 15px;
+        border-radius: 15px;
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+        margin-top: 20px;
+        box-shadow: 0px 2px 6px rgba(0,0,0,0.3);
     }
     </style>
     """,
@@ -109,7 +120,10 @@ with st.container():
         scaled = scaler.transform(features)
         prediction = model.predict(scaled)[0]
 
-        # Show result with emoji
-        st.success(f"🌿 Recommended Crop: **{prediction.capitalize()}** {crop_dict.get(prediction, '')}")
+        # Show result inside styled box
+        st.markdown(
+            f'<div class="result-box">🌿 Recommended Crop: <br><br> {prediction.capitalize()} {crop_dict.get(prediction, "")}</div>',
+            unsafe_allow_html=True
+        )
 
     st.markdown('</div>', unsafe_allow_html=True)
