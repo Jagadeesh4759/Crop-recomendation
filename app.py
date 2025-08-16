@@ -1,22 +1,39 @@
 import streamlit as st
 import joblib
 import numpy as np
+import base64
 
 # Load model and scaler
 model = joblib.load("crop_model.joblib")
 scaler = joblib.load("crop_scaler.joblib")
 
-# Custom CSS for styling
+# ✅ Function to set background from local file
+def add_bg_from_local(image_file):
+    with open(image_file, "rb") as f:
+        data = f.read()
+    encoded = base64.b64encode(data).decode()
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background: url("data:image/png;base64,{encoded}");
+            background-size: cover;
+            background-position: center;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+# Call function
+add_bg_from_local("farm_background.png")
+
+# Custom CSS
 st.markdown(
     """
     <style>
-    .stApp {
-        background: url("farm_background.png");
-        background-size: cover;
-        background-position: center;
-    }
     .main-container {
-        background-color: rgba(0, 128, 0, 0.75);  /* semi-transparent green */
+        background-color: rgba(0, 128, 0, 0.75);
         padding: 30px;
         border-radius: 20px;
         box-shadow: 0px 4px 12px rgba(0,0,0,0.4);
@@ -25,7 +42,7 @@ st.markdown(
         margin: auto;
     }
     .header-bar {
-        background-color: #006400;   /* dark green */
+        background-color: #006400;
         padding: 15px;
         border-top-left-radius: 20px;
         border-top-right-radius: 20px;
@@ -36,9 +53,7 @@ st.markdown(
         font-size: 26px;
         margin: 0;
     }
-    .content {
-        padding-top: 20px;
-    }
+    .content { padding-top: 20px; }
     .result-box {
         background-color: white;
         color: black;
@@ -50,8 +65,6 @@ st.markdown(
         margin-top: 20px;
         box-shadow: 0px 2px 6px rgba(0,0,0,0.3);
     }
-
-    /* ✅ Make all entered input values white, bigger, bold */
     div[data-baseweb="input"] input[type="number"],
     div[data-baseweb="input"] input[type="text"] {
         color: white !important;
@@ -65,39 +78,20 @@ st.markdown(
 
 # Crop emojis dictionary
 crop_emojis = {
-    "rice": "🌾",
-    "maize": "🌽",
-    "chickpea": "🍲",
-    "kidneybeans": "🫘",
-    "pigeonpeas": "🌿",
-    "mothbeans": "🫘",
-    "mungbean": "🫘",
-    "blackgram": "🫘",
-    "lentil": "🥣",
-    "pomegranate": "🍎",
-    "banana": "🍌",
-    "mango": "🥭",
-    "grapes": "🍇",
-    "watermelon": "🍉",
-    "muskmelon": "🍈",
-    "apple": "🍏",
-    "orange": "🍊",
-    "papaya": "🥭",
-    "coconut": "🥥",
-    "cotton": "👕",
-    "jute": "🧵",
-    "coffee": "☕"
+    "rice": "🌾", "maize": "🌽", "chickpea": "🍲", "kidneybeans": "🫘",
+    "pigeonpeas": "🌿", "mothbeans": "🫘", "mungbean": "🫘", "blackgram": "🫘",
+    "lentil": "🥣", "pomegranate": "🍎", "banana": "🍌", "mango": "🥭",
+    "grapes": "🍇", "watermelon": "🍉", "muskmelon": "🍈", "apple": "🍏",
+    "orange": "🍊", "papaya": "🥭", "coconut": "🥥", "cotton": "👕",
+    "jute": "🧵", "coffee": "☕"
 }
 
 # App Layout
 st.markdown('<div class="main-container">', unsafe_allow_html=True)
-
-# Header bar
 st.markdown('<div class="header-bar"><h1>🌱 Smart Crop Prediction 🌱</h1></div>', unsafe_allow_html=True)
-
 st.markdown('<div class="content">', unsafe_allow_html=True)
 
-# Input fields
+# Inputs
 N = st.number_input("Nitrogen (N)", min_value=0.0, step=1.0)
 P = st.number_input("Phosphorus (P)", min_value=0.0, step=1.0)
 K = st.number_input("Potassium (K)", min_value=0.0, step=1.0)
@@ -110,12 +104,8 @@ if st.button("Predict Crop"):
     features = np.array([[N, P, K, temperature, humidity, ph, rainfall]])
     scaled_features = scaler.transform(features)
     prediction = model.predict(scaled_features)[0]
-
     emoji = crop_emojis.get(prediction, "🌱")
-    st.markdown(
-        f'<div class="result-box">Recommended Crop: {prediction.capitalize()} {emoji}</div>',
-        unsafe_allow_html=True
-    )
+    st.markdown(f'<div class="result-box">Recommended Crop: {prediction.capitalize()} {emoji}</div>', unsafe_allow_html=True)
 
 st.markdown('</div>', unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
