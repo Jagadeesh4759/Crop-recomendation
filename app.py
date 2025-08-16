@@ -1,21 +1,31 @@
 import streamlit as st
 import joblib
 import numpy as np
+import base64
 
 # Load model and scaler
 model = joblib.load("crop_model.joblib")
 scaler = joblib.load("crop_scaler.joblib")
 
-# Custom CSS for styling
+# Function to load and encode background image
+def get_base64_of_bin_file(bin_file):
+    with open(bin_file, "rb") as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+# Encode farm background
+background_image = get_base64_of_bin_file("farm_background.png")
+
+# Custom CSS for styling with embedded background
 st.markdown(
-    """
+    f"""
     <style>
-    .stApp {
-        background: url("farm_background.png");
+    .stApp {{
+        background: url("data:image/png;base64,{background_image}");
         background-size: cover;
         background-position: center;
-    }
-    .main-container {
+    }}
+    .main-container {{
         background-color: rgba(0, 128, 0, 0.75);  /* semi-transparent green */
         padding: 30px;
         border-radius: 20px;
@@ -23,23 +33,23 @@ st.markdown(
         color: black;
         max-width: 500px;
         margin: auto;
-    }
-    .header-bar {
+    }}
+    .header-bar {{
         background-color: #006400;   /* dark green */
         padding: 15px;
         border-top-left-radius: 20px;
         border-top-right-radius: 20px;
         text-align: center;
-    }
-    .header-bar h1 {
+    }}
+    .header-bar h1 {{
         color: white;
         font-size: 26px;
         margin: 0;
-    }
-    .content {
+    }}
+    .content {{
         padding-top: 20px;
-    }
-    .result-box {
+    }}
+    .result-box {{
         background-color: white;
         color: black;
         padding: 15px;
@@ -49,15 +59,20 @@ st.markdown(
         font-weight: bold;
         margin-top: 20px;
         box-shadow: 0px 2px 6px rgba(0,0,0,0.3);
-    }
+    }}
 
-    /* 🔴 Make all entered input values red, bold, bigger */
-    div[data-baseweb="input"] input[type="number"],
-    div[data-baseweb="input"] input[type="text"] {
+    /* 🔴 Only Nitrogen input entered text will be red */
+    div[data-baseweb="input"]:has(input[aria-label="Nitrogen (N)"]) input {{
         color: red !important;
         font-size: 16px !important;
         font-weight: bold !important;
-    }
+    }}
+
+    /* Others remain normal (dark/black text) */
+    div[data-baseweb="input"] input {{
+        color: black !important;
+        font-size: 15px !important;
+    }}
     </style>
     """,
     unsafe_allow_html=True
